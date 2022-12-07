@@ -7,15 +7,19 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lalosapps.todoapp.addtasks.ui.components.AddTasksDialog
 import com.lalosapps.todoapp.addtasks.ui.components.FabDialog
+import com.lalosapps.todoapp.addtasks.ui.components.TasksList
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun TasksScreen(
     viewModel: TasksViewModel = hiltViewModel()
 ) {
-
     val isVisible = viewModel.showDialog
+    val tasks = viewModel.tasks.collectAsStateWithLifecycle().value
     Scaffold(
         floatingActionButton = {
             FabDialog(onClick = viewModel::onDialogShow)
@@ -30,6 +34,11 @@ fun TasksScreen(
                 visible = isVisible,
                 onDismiss = viewModel::onDialogHide,
                 onTaskAdded = viewModel::onTaskCreated
+            )
+            TasksList(
+                tasks = tasks,
+                onTaskCheckedChange = viewModel::onTaskCheckedChange,
+                onTaskDeleted = viewModel::onTaskDeleted
             )
         }
     }

@@ -3,19 +3,19 @@ package com.lalosapps.todoapp.addtasks.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -29,6 +29,7 @@ fun AddTasksDialog(
 ) {
     if (visible) {
         var task by rememberSaveable { mutableStateOf("") }
+        val isError by remember { derivedStateOf { task.isEmpty() } }
         Dialog(onDismissRequest = onDismiss) {
             Column(
                 modifier = modifier
@@ -49,11 +50,18 @@ fun AddTasksDialog(
                     value = task,
                     onValueChange = { task = it },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { if (!isError) onTaskAdded(task) }
+                    ),
+                    isError = isError
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = { onTaskAdded(task) },
+                    onClick = { if (!isError) onTaskAdded(task) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Add")
